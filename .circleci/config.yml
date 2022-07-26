@@ -7,14 +7,19 @@ commands:
   destroy-environments:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      # Add parameter here   
+      workflow_id: 
+        type: string 
+        # Add parameter here   
     steps:
       - run:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:5} \
+            aws cloudformation delete-stack \
+            --stack-name udapeople-backend-<<parameters.workflow_id>>
+            aws s3 rm s3://udapeople-<<parameters.workflow_id>> --recursive 
+            aws cloudformation delete-stack \
+            --stack-name udapeople-frontend-<<parameters.workflow_id>> \
 
 jobs:
   build-frontend:
@@ -108,12 +113,16 @@ jobs:
             npm install
             # npm install oauth-sign@^0.9.0
             npm audit fix --audit-level=critical --force
+      - slack/notify:
+        event: fail
+        template:basic_fail_1
 
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli  # Docker image here that supports AWS CLI
     steps:
-      - checkout # Checkout code from git
+      - checkout
+      - run: yum install -y tar gzip # Checkout code from git
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -137,7 +146,7 @@ jobs:
           command: |
             BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \ 
-            --filter "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text)
             echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
             cat .circleci/ansible/inventory.txt  
@@ -145,9 +154,10 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - cdond-c3-projectstarter/.circleci/ansible/inventory.txt
+            - project/.circleci/ansible/inventory.txt
 
-      #- destroy-environments            
+      - destroy-environments:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}            
 
 
 workflows:
