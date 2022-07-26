@@ -114,7 +114,7 @@ jobs:
             # npm install oauth-sign@^0.9.0
             npm audit fix --audit-level=critical --force
       - slack/notify:
-        event: fail
+        when: on_fail
         template: basic_fail_1
 
   deploy-infrastructure:
