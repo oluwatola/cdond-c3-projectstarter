@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 version: 2.1
 
 
@@ -45,3 +46,5 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
+=======
+>>>>>>> aac7b1bfb9b89034862c73915761d77171eec9f7
