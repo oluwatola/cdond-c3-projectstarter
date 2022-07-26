@@ -73,7 +73,7 @@ jobs:
           keys: [frontend-scan]     
       - run:
           name: front-end scan
-          command:
+          command: |
             cd frontend
             npm install
             # npm install oauth-sign@^0.9.0
@@ -88,7 +88,7 @@ jobs:
           keys: [backend-scan]     
       - run:
           name: back-end scan
-          command:
+          command: |
             cd backend
             npm install
             # npm install oauth-sign@^0.9.0
