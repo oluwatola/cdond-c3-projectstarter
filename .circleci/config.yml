@@ -300,22 +300,18 @@ jobs:
 
   deploy-backend:
     docker:
-      - image:  python:3.7-alpine3.16 #cimg/base:stable Docker image here that supports Ansible
+      - image: cimg/base:stable #python:3.7-alpine3.16 Docker image here that supports Ansible
     steps:
       - checkout
       - install_awscli
       - install_ansible
       - install_nodejs
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update --no-cache tar gzip nodejs ansible aws-cli curl
-      - add_ssh_keys:
-          fingerprints: ["05:c5:2d:a9:7e:9c:b5:52:f3:ca:64:d6:eb:77:5f:f9"] # Add ssh keys with fingerprint
       #- run:
       #    name: Install dependencies
       #    command: |
-      #      apk add --update --no-cache tar gzip nodejs npm aws-cli ansible
+      #      apk add --update --no-cache tar gzip nodejs ansible aws-cli curl
+      - add_ssh_keys:
+          fingerprints: ["05:c5:2d:a9:7e:9c:b5:52:f3:ca:64:d6:eb:77:5f:f9"] # Add ssh keys with fingerprint
       - attach_workspace:
           at: ~/
       - restore_cache:
@@ -349,8 +345,8 @@ jobs:
             cd ..
             cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
-         name: Deploy backend
-         command: |
+          name: Deploy backend
+          command: |
             export TYPEORM_MIGRATIONS_DIR=./migrations
             export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
             export TYPEORM_MIGRATIONS=./migrations/*.ts
