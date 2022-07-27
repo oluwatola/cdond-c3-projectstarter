@@ -31,7 +31,6 @@ commands:
           command: |
             SUCCESS=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/migration_<<parameters.workflow_id>>)  # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             #Logic for reverting the database state
-            #SUCCESS = 1
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
