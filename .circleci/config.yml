@@ -266,12 +266,7 @@ jobs:
       - image: cimg/base:stable #python:3.7-alpine3.16 # Docker image here that supports AWS CLI
     steps:
       - checkout # Checkout code from git
-      - run:
-          name: install curl
-          command:
-            apk --update --no-cache tar gzip curl
       - install_awscli
-      - install_ansible
       - install_nodejs
       - restore_cache:
           keys: [frontend-deps]
