@@ -1,8 +1,9 @@
 ---
+
 - name: "Creates backend app directory"
   file:
     path: ~/backend-app
-    state: directory"
+    state: directory
 
 - name: "Unarchive backend files"
   unarchive:
