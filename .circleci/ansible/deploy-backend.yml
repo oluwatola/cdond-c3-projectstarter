@@ -14,6 +14,7 @@
 
   environment:
     NODE_ENV: production
+    ENVIRONMENT: production
     VERSION: "1"
     TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"
     TYPEORM_ENTITIES: "{{ lookup('env', 'TYPEORM_ENTITIES')}}"
