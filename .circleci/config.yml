@@ -240,14 +240,14 @@ jobs:
             unzip -qq awscliv2.zip
             sudo ./aws/install
             #apk add --update --no-cache tar gzip nodejs npm aws-cli curl
-      - restore_cache:
-          keys: [backend-build]
+      #- restore_cache:
+      #    keys: [backend-build]
       - run:
           name: Run migrations
           command: |
-            cd backend 
+            cd backend
             npm install
-            npm run migrations >> migrations.txt
+            npm run migrations > migrations.txt
       - run:
           name: send migration results to kvdb.io
           command: |
