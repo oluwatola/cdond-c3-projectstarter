@@ -417,7 +417,7 @@ jobs:
       - destroy-environments # Here's where you will add some code to rollback on failure
       - revert-migrations
 
-  cleanup:
+cleanup:
     docker:
       - image: cimg/base:stable
     steps:
@@ -452,6 +452,7 @@ jobs:
             else 
               echo "-----------------Cannot Cleanup------------------"
             fi
+
 
 workflows:
   default:
