@@ -405,9 +405,9 @@ jobs:
           name: Backend smoke test
           command: |
             BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
-            --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --output text)
+              --filter Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
               
             export API_URL="http://${BACKEND_PUBLIC_IP}:3030"
             echo ${BACKEND_PUBLIC_IP}
@@ -415,7 +415,6 @@ jobs:
             echo ${API_URL}
 
             if curl -s ${API_URL}/api/status | grep "ok"
-            #if curl -v --head "https://google.com"
             then
               exit 0
             else
@@ -431,8 +430,8 @@ jobs:
             else
               exit 1
             fi
-      - destroy-environments
-      - revert-migrations
+      #- destroy-environments
+      #- revert-migrations
 
   cloudfront-update:
     docker: 
