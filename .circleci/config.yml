@@ -465,6 +465,10 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout 
+      - run:
+          name: Install dependencies
+          command: |
+            yum install -y tar gzip curl
       - attach_workspace:
           at: ~/
       - run:
