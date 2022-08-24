@@ -354,13 +354,14 @@ jobs:
             cd .circleci/ansible
             mkdir files
             cd files
-            tar -C ../../../backend -czvf atrifact.tar.gz .
+            tar -C ../../../backend -czvf artifact.tar.gz .
             cd ../
 
             # tar -C backend -czvf artifact.tar.gz .
             # mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
             # mv artifact.tar.gz .circleci/ansible/roles/deploy/files/artifact.tar.gz
             # cd .circleci/ansible
+          
             echo "Contents of the inventory.txt file is ------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
