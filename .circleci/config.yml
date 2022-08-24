@@ -465,7 +465,6 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout 
-      - install_nodejs
       - run:
           name: Get old stack workflow id
           command: |
