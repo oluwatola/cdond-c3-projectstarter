@@ -8,7 +8,7 @@ commands:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       workflow_id: 
-        type: string         # Add parameter here
+        type: string  
         default: ${CIRCLE_WORKFLOW_ID:0:7}   
     steps:
       - run:
@@ -31,7 +31,7 @@ commands:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-         #apk add --update --no-cache aws-cli \
+         
 
   install_ansible:
     description: install Ansible v2
@@ -57,12 +57,12 @@ commands:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
       workflow_id: 
-        type: string         # Add parameter here
+        type: string     
         default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Revert migrations
-          when: on_fail # Add when this will run
+          when: on_fail 
           command: |
             SUCCESS=$(curl --insecure https://kvdb.io/9MLkoxjACDXB2bc7gv9Mag/migration_<<parameters.workflow_id>>)  # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             #Logic for reverting the database state
@@ -112,9 +112,9 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - checkout # Checkout code from git
+      - checkout 
       - restore_cache:
-          keys: [frontend-test] # Restore from cache
+          keys: [frontend-test] 
       - run: 
           name: Front-end test
           command: |
@@ -129,9 +129,9 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - checkout # Checkout code from git
+      - checkout 
       - restore_cache:
-          keys: [backend-test] # Restore from cache
+          keys: [backend-test] 
       - run: 
           name: Back-end test
           command: |
@@ -181,9 +181,9 @@ jobs:
       
   deploy-infrastructure:
     docker:
-      - image: amazon/aws-cli  # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli  
     steps:
-      - checkout   # Checkout code from git
+      - checkout   
       - run: 
           name: Install dependencies
           command: |
@@ -220,17 +220,13 @@ jobs:
    
   configure-infrastructure:
     docker:
-      - image: cimg/base:stable #python:3.7-alpine3.16  #Docker image here that supports Ansible
+      - image: cimg/base:stable 
     steps:
-      - checkout # Checkout code from git
+      - checkout 
       - add_ssh_keys:
           fingerprints: ["05:c5:2d:a9:7e:9c:b5:52:f3:ca:64:d6:eb:77:5f:f9"] # Add ssh keys with fingerprint
-      - attach_workspace: # attach workspace
+      - attach_workspace: 
           at: ~/
-      #- run:
-      #    name: Install dependencies
-      #    command: |
-      #      apk add --update --no-cache tar gzip ansible aws-cli
       - install_awscli
       - install_ansible
       - run:
@@ -239,23 +235,13 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environments      # Here's where you will add some code to rollback on failure          
+      - destroy-environments                
 
   run-migrations:
     docker:
-      - image: circleci/node:13.8.0  #python:3.7-alpine3.16  Docker image here that supports NodeJS
+      - image: circleci/node:13.8.0  
     steps:
       - checkout 
-      # - run:
-      #     name: install dependencies
-      #     command: |
-      #       #sudo apt install -y tar gzip curl
-      #       #curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #       #unzip -qq awscliv2.zip
-      #       #sudo ./aws/install
-      #       apk add --update --no-cache tar gzip nodejs npm aws-cli curl
-      # - restore_cache:
-      #     keys: [backend-build]
       - run:
           name: Run migrations
           command: |
@@ -275,9 +261,9 @@ jobs:
       
   deploy-frontend:
     docker:
-      - image: cimg/base:stable #python:3.7-alpine3.16 # Docker image here that supports AWS CLI
+      - image: cimg/base:stable 
     steps:
-      - checkout # Checkout code from git
+      - checkout 
       - add_ssh_keys:
           fingerprints: ["05:c5:2d:a9:7e:9c:b5:52:f3:ca:64:d6:eb:77:5f:f9"]
       - attach_workspace:
@@ -287,11 +273,7 @@ jobs:
       - install_ansible
       - restore_cache:
           keys: [frontend-deps]
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       cd frontend 
-      #       npm install    #apk add --update --no-cache tar gzip nodejs npm aws-cli curl
+      
       - run:
           name: Get backend url
           command: |
@@ -316,11 +298,11 @@ jobs:
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
       - destroy-environments
-      - revert-migrations # Here's where you will add some code to rollback on failure
+      - revert-migrations 
 
   deploy-backend:
     docker:
-      - image:  cimg/base:stable #python:3.7-alpine3.16 Docker image here that supports Ansible
+      - image:  cimg/base:stable 
     steps:
       - checkout
       - add_ssh_keys:
@@ -331,18 +313,6 @@ jobs:
       - install_awscli
       - install_ansible
 
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       apk add --update --no-cache tar gzip nodejs ansible aws-cli npm curl
-      # - attach_workspace:
-      #     at: ~/
-      #- run:
-      #    name: Install dependencies
-      #    command: |
-      #      apk add --update --no-cache tar gzip nodejs ansible npm curl
-      #- restore_cache:
-      #    keys: [backend-deps]
       - run: 
           name: Deploy backend
           command: |
@@ -360,39 +330,15 @@ jobs:
             echo "Contents of the inventory.txt file is ------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      #- run:
-      #    name: Install dependencies
-      #    command: |
-      #      cd backend
-      #      npm install
-      #- run:
-      #    name: Package Backend
-      #    command: |
-      #      cd backend
-      #      npm run build
-      #      tar -czf artifact.tar.gz dist/* package*
-      #
-      #      cd ..
-      #      cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
-      #- run:
-      #    name: Deploy backend
-      #    command: |
-      #      export TYPEORM_MIGRATIONS_DIR=./migrations
-      #      export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-      #      export TYPEORM_MIGRATIONS=./migrations/*.ts
-      #
-      #      cd .circleci/ansible
-      #      cat inventory.txt
-      #      ansible-playbook -i inventory.txt deploy-backend.yml
-
+      
       - destroy-environments
-      - revert-migrations # Here's where you will add some code to rollback on failure 
+      - revert-migrations  
 
   smoke-test:
     docker:
-      - image: cimg/base:stable #python:3.7-alpine3.16      # Lightweight Docker image 
+      - image: cimg/base:stable  
     steps:
-      - checkout # Checkout code from git
+      - checkout 
 
       - install_awscli
       - install_nodejs
@@ -430,17 +376,11 @@ jobs:
 
   cloudfront-update:
     docker: 
-      - image: amazon/aws-cli  #cimg/base:stable  Docker image here that supports AWS CLI
+      - image: amazon/aws-cli  
     steps:
-      - checkout # Checkout code from git
-      #- attach_workspace: # attach workspace
-      #    at: ~/
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       yum install -y tar gzip curl
+      - checkout 
       - run:
-          name: Save Old WOrkflow ID to kvdb.io
+          name: Save Old Workflow ID to kvdb.io
           command: |
             export OLD_WORKFLOW_ID=$(aws cloudformation \
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
@@ -455,25 +395,7 @@ jobs:
               --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
               --stack-name InitialStack
             
-            #echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
-
-            # export OldWorkflowID=$(aws cloudformation \
-            #   list-exports --query "Exports[?Name==\'WorkflowID\'].Value" \
-            #   --no-paginate --output text)
-            # echo $OldWorkflowID >> ~/OldWorkflowID.txt
-            # cat ~/OldWorkflowID.txt
-
-            # aws cloudformation deploy \
-            #   --template-file .circleci/files/cloudfront.yml \
-            #   --stack-name InitialStack
-            #   --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-            #   --tags project=udapeople
-
-            # echo OldWorkflowID: "${OldWorkflowID}"
-            # echo Current Workflow Id: "${CIRCLE_WORKFLOW_ID:0:7}"
-              
-
-      - destroy-environments # Here's where you will add some code to rollback on failure
+      - destroy-environments 
       - revert-migrations
 
   cleanup:
@@ -482,10 +404,6 @@ jobs:
     steps:
       - checkout
       - install_awscli 
-      # - run:
-      #     name: Install dependencies
-      #     command: |
-      #       yum install -y tar gzip curl
       - attach_workspace:
           at: ~/
       - run:
