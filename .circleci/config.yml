@@ -435,15 +435,15 @@ jobs:
       - checkout # Checkout code from git
       #- attach_workspace: # attach workspace
       #    at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            yum install -y tar gzip curl
+      # - run:
+      #     name: Install dependencies
+      #     command: |
+      #       yum install -y tar gzip curl
       - run:
           name: Save Old WOrkflow ID to kvdb.io
           command: |
             export OLD_WORKFLOW_ID=$(aws cloudformation \
-              list-exports --query "Exports[?Name==\'WorkflowID\'].Value" \
+              list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
             echo "Old Workflow ID: $OLD_WORKFLOW_ID"
             curl https://kvdb.io/9MLkoxjACDXB2bc7gv9Mag/old_workflow_id -d "${OLD_WORKFLOW_ID}"
@@ -546,8 +546,8 @@ workflows:
       #    requires: [run-migrations]
       #- smoke-test:
       #    requires: [deploy-backend, deploy-frontend]
-      #- cloudfront-update:
+      - cloudfront-update
       #    requires: [smoke-test]
-      - cleanup
-      #    requires: [cloudfront-update] 
+      - cleanup:
+          requires: [cloudfront-update] 
 
